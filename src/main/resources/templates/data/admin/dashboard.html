@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="utf-8">
+		<title>Admin | Anchor</title>
+		<link rel="stylesheet" href="../../css/styles.css">
+		<link rel="stylesheet" href="../../css/dashboard.css">
+		<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+		<script>
+				function show_div(beginning, action) {
+					var list = document.querySelectorAll("[id^=" + beginning + "]");
+					var array = [...list];
+					array.forEach(el => {
+						el.style.display="none"
+					});
+					if (beginning==="noti-") {
+						document.getElementById("sidebarLabel").textContent = "Notifications - " + action;
+					}
+					document.getElementById(beginning + action).style.display="flex";
+				}
+				
+				$(document).on('click', '.nav-link.active', function () {
+			        var href = $(this).attr('data-bs-target').substring(1);
+			        $(".nav-link").removeClass('active');
+			        $('.tab-pane').removeClass('active');
+
+			        $(this).addClass('active');
+			        $('.tab-pane[id="' + href + '"]').addClass('active');
+			    });
+				
+				$(document).ready(function() {
+					show_div("noti-", "all");
+
+					var colorMatch = {
+					    'REFUSED'     	: 'red',
+					    'PENDING'    	: 'orange',
+					    'ACCEPTED'   	: 'green',
+					    'IN_PROGRESS'   : 'purple',
+					    'URGENT'     	: 'red',
+					    'MEDIUM'    	: 'orange',
+					    'LOW'   		: 'green'
+					};
+					console.log(colorMatch);
+					var el;
+					var st;
+					$('.status').each(function(index) {
+						el = $(this);
+						st = $(this).attr('status');
+						$.each(colorMatch, function(name, value) {
+							if (st===name) {
+								el.addClass(value);
+							}
+							
+						});
+					});
+					
+					$('.priority').each(function(index) {
+						el = $(this);
+						st = $(this).attr('priority');
+						$.each(colorMatch, function(name, value) {
+							if (st===name) {
+								el.addClass(value);
+							}
+							
+						});
+					});
+				});
+		</script>
+		<style>
+			.red {
+				color: red;
+			}
+			.orange {
+				color: orange;
+			}
+			.purple {
+				color: purple;
+			}
+			.green {
+				color: green;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container-fluid text-center title">
+			<h1><b>Welcome, <span th:text="${name}"></span>!</b></h1>
+			<h3><b><span th:text="${role}"></span> panel</b></h3>
+		</div>
+		<nav class="container-fluid" style="padding: 0 !important">
+			<div class="nav nav-tabs d-flex" id="nav-tab" role="tablist" style="justify-content: space-between">
+				<div class="d-flex" style="justify-content: left">
+					<button class="hand flex-fill nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Users</button>
+					<button class="hand flex-fill nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#activities" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Activities</button>
+					<button class="hand flex-fill nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#assignations" type="button" role="tab" aria-controls="nav-contact" aria-selected="false">Assignations</button>
+					<button class="hand flex-fill nav-link" id="nav-sidebar-tab" data-bs-toggle="offcanvas" data-bs-target="#sidebar" type="button" role="tab" aria-controls="sidebar" aria-selected="false">Notifications (<span th:text="${unread.size}"></span>)</button>
+				</div>
+				<div class="d-flex" style="justify-content: flex-end">
+					<button class="hand nav-link" style="align-self: flex-end" th:onclick="|window.location.href='/data/dashboard'|">Your DashBoard</button>
+					<button class="hand nav-link" style="align-self: flex-end" th:onclick="|window.location.href='/auth/logout'|">Logout</button>
+				</div>
+			</div>
+		</nav>
+		
+		<div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
+			<div class="offcanvas-header">
+				<div class="dropdown">
+					<button type="button" class="btn" id="filterButton" data-bs-toggle="dropdown" aria-expanded="false"><h3 style="color: black !important" class="bi bi-filter"></h3></button>
+					<div class="dropdown-menu" aria-labelledby="filterButton">
+						<button class="dropdown-item" onclick="show_div('noti-', 'all')" th:disabled="${notifications.size}==0">All [<span th:text="${notifications.size}"></span>]</button>
+						<button class="dropdown-item" onclick="show_div('noti-', 'unread')" th:disabled="${unread.size}==0">Unread [<span th:text="${unread.size}"></span>]</button>
+						<button class="dropdown-item" onclick="show_div('noti-', 'read')" th:disabled="${read.size}==0">Read [<span th:text="${read.size}"></span>]</button>
+					</div>
+				</div>
+				<h5 class="offcanvas-title text-center w-100" id="sidebarLabel"></h5>
+				<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+			</div>
+			<div class="offcanvas-body">
+				<div id="noti-all" class="flex-column" role="alert">
+					<div class="d-flex flex-column alert alert-success alert-dismissable fade show notification " th:each="ntf: ${notifications}">
+						<div class="d-flex flex-row">
+							<h4 class="alert-heading w-100 mb-0"><span th:text="${ntf.title}"></span></h4>
+							<form th:action="@{/data/admin/dashboard?edit=read}" method="POST">
+								<input type="hidden" th:name="notificationid" th:value="${ntf.id}"/>
+								<button type="submit" th:name="notificationid" class="btn"><i class="bi bi-check2-square"></i></button>
+							</form>
+						</div>
+						<hr>
+						<p style="white-space: pre" th:text='${ntf.body.replaceAll("\[", " ").replaceAll("\]", "")}'></p>
+						<hr>
+						<span th:text="${#strings.multipleReplace(ntf.timestamp.toString.replaceFirst('[.].*', ''), 'T', '&nbsp;')}"></span>						
+					</div>
+				
+				</div>
+				<div id="noti-unread" class="flex-column" role="alert">
+					<div class="d-flex flex-column alert alert-success alert-dismissable fade show notification " th:each="ntf: ${unread}">
+						<div class="d-flex flex-row">
+							<h4 class="alert-heading w-100 mb-0"><span th:text="${ntf.title}"></span></h4>
+							<form th:action="@{/data/admin/dashboard?edit=read}" method="POST">
+								<input type="hidden" th:name="notificationid" th:value="${ntf.id}"/>
+								<button type="submit" th:name="notificationid" class="btn"><i class="bi bi-check2-square"></i></button>
+							</form>
+						</div>
+						<hr>
+						<p style="white-space: pre" th:text='${ntf.body.replaceAll("\[", " ").replaceAll("\]", "")}'></p>
+						<hr>
+						<span th:text="${#strings.multipleReplace(ntf.timestamp.toString.replaceFirst('[.].*', ''), 'T', '&nbsp;')}"></span>						
+					</div>
+				
+				</div>
+				<div id="noti-read" class="flex-column" role="alert">
+					<div class="d-flex flex-column alert alert-success alert-dismissable fade show notification " th:each="ntf: ${read}">
+						<div class="d-flex flex-row">
+							<h4 class="alert-heading w-100 mb-0"><span th:text="${ntf.title}"></span></h4>
+						</div>
+						<hr>
+						<p style="white-space: pre" th:text='${ntf.body.replaceAll("\[", " ").replaceAll("\]", "")}'></p>
+						<hr>
+						<span th:text="${#strings.multipleReplace(ntf.timestamp.toString.replaceFirst('[.].*', ''), 'T', '&nbsp;')}"></span>						
+					</div>
+				</div>
+			</div>
+		</div>
+	
+		<div class="tab-content container" id="nav-tabContent">
+			<div class="tab-pane fade show active container-fluid" id="users" role="tabpanel" aria-labelledby="nav-home-tab">
+			  	<div class="shadow-container container">
+					<div class="container-fluid">
+						<h4 class="text-center rosa">USER TABLE</h4>
+						<table class="table table-hover table-bordered">
+							<thead>
+								<tr>
+									<td><b>Name</b></td>
+									<td><b>Email</b></td>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:if="${ulist.size} != 0" th:each="user: ${ulist}">
+									<td th:text="${user.name}" />
+									<td th:text="${user.mail}" />
+									<td>
+										<form th:action="@{/data/admin/dashboard?edit=delete_user}" method="POST">
+											<input type="hidden" th:name="username" th:value="${user.name}"/>
+											<button class="btn btn-primary pull-right" style="width:100%" th:name="name" th:value="${user.name}" type="submit">Remove</button>
+										</form>
+					  				</td>
+								</tr>
+								<tr th:unless="${ulist.size} != 0">
+									<td colspan="3" class="text-center">No users</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="container-fluid">
+						<div class="d-grid gap-2 container d-flex drop-page" style="padding: 5vh 0;">
+					  		<button onclick="show_div('button-data-', 'add-user')" style="margin-right: 1%" class="btn btn-primary pull-right flex-fill" type="button">Add</button>
+						</div>
+						<div class="container flex-column wrapper" id="button-data-add-user">
+							<form th:action="@{/data/admin/dashboard?edit=create_user}" method="POST">
+								<p>Insert user you want to create</p>
+								<div class="container-fluid field">
+									<input class="in" type="text" th:name="mail" name="mail" required>
+					               	<label for="mail" style="left: 2%">Email</label>
+								</div>
+								<div class="container-fluid d-flex flex-row" style="padding: 0 !important; margin-top: 3vh">
+									<div class="d-flex field" style="margin-right: 1%">
+						               	<input class="in" type="text" th:name="username" name="username" required>
+						               	<label style="left: 4%" for="username">Username</label>
+					               	</div>
+					               	<div class="d-flex field" style="margin-left: 1%">
+						               	<input class="in" type="text" th:name="psw" name="psw" required>
+						               	<label style="left: 4%" for="psw">Password</label>
+					               	</div>
+								</div>
+								<div class="d-grid gap-2">
+				  					<button class="btn btn-primary buttanone" type="submit" style="width: 100%">Submit</button>
+								</div>
+							</form>
+						</div>
+					</div>
+					<div class="container-fluid">
+						<div th:if="${success}!=null and ${response}!=null and ${location}==user">
+							<div th:if="${success}==false" class="alert alert-warning alert-dismissable fade show" role="alert" id="ealert">
+									<h4 class="alert-heading">Error!</h4>
+									Uh oh! <span style="white-space: pre-line" th:text="${response}"></span>
+									<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('ealert').style.display = 'none'">
+								    	<span aria-hidden="true">&times;</span>
+								  	</button>
+							</div>
+							<div th:unless="${success}==false" class="alert alert-success alert-dismissable fade show" role="alert" id="salert">
+								<h4 class="alert-heading">Success!</h4>
+								Oh yeah, you <span style="white-space: pre-line" th:text="${response}"></span>
+								<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('salert').style.display = 'none'">
+							    	<span aria-hidden="true">&times;</span>
+							  	</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="tab-pane fade container-fluid" id="activities" role="tabpanel" aria-labelledby="nav-profile-tab">
+				<div class="shadow-container container">
+					<div class="container-fluid">
+						<h4 class="text-center rosa">ACTIVITIES TABLE</h4>
+						<table class="table table-hover table-bordered">
+							<thead>
+								<tr>
+									<td><b>Name</b></td>
+									<td><b>Id</b></td>
+									<td><b>Priority</b></td>
+									<td><b>Status</b></td>
+									<td><b>Edit</b></td>
+									<td><b>Team chat</b></td>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:if="${alist.size} != 0" th:each="activity: ${alist}">
+									<td th:text="${activity.name}" />
+									<td th:text="${activity.id}" />
+									<td class="priority bold" th:attr="priority=${activity.priority}" th:text="${activity.priority}" />
+									<td class="status bold" th:attr="status=${activity.status}" th:text="${activity.status}" />
+									<td>
+										<form th:action="@{/data/editActivity}" style="width:100%"  method="POST">
+											<input type="hidden" th:name="role" th:value="${adminrole}">
+											<button class="btn btn-primary pull-right" style="width:100%" th:name="id" th:value="${activity.id}" type="submit">Edit</button>
+										</form>
+					  				</td>
+					  				<td>
+										<form th:action="@{/data/editActivity#msg}" style="width:100%"  method="POST">
+											<input type="hidden" th:name="role" th:value="${adminrole}">
+											<button class="btn btn-primary pull-right" style="width:100%" th:name="id" th:value="${activity.id}" type="submit">Chat</button>
+										</form>
+					  				</td>
+								</tr>
+								<tr th:unless="${alist.size} != 0">
+									<td colspan="3" class="text-center">No activities</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					
+					<div class="container-fluid">
+						<div class="d-grid gap-2 container d-flex drop-page" style="padding: 5vh 0;">
+					  		<button onclick="show_div('button-data-', 'add')" style="margin-right: 1%" class="btn btn-primary pull-right flex-fill" type="button">Add</button>
+					  		<button onclick="show_div('button-data-', 'remove')" style="margin: 0 1%" class="btn btn-primary pull-right flex-fill" type="button">Remove</button>
+					  		<button onclick="show_div('button-data-', 'assign')" style="margin-left: 1%" class="btn btn-primary pull-right flex-fill" type="button">Assign</button>
+						</div>
+						
+						<div th:if="${success}!=null and ${response}!=null and ${location}==activity">
+							<div th:if="${success}==false" class="alert alert-warning alert-dismissable fade show" role="alert" id="ealert">
+									<h4 class="alert-heading">Error!</h4>
+									Uh oh! <span style="white-space: pre-line" th:text="${response}"></span>
+									<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('ealert').style.display = 'none'">
+								    	<span aria-hidden="true">&times;</span>
+								  	</button>
+							</div>
+							<div th:unless="${success}==false" class="alert alert-success alert-dismissable fade show" role="alert" id="salert">
+								<h4 class="alert-heading">Success!</h4>
+								Oh yeah, you <span style="white-space: pre-line" th:text="${response}"></span>
+								<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" onclick="document.getElementById('salert').style.display = 'none'">
+							    	<span aria-hidden="true">&times;</span>
+							  	</button>
+							</div>
+						</div>
+						
+						<div class="container flex-column wrapper" id="button-data-add">
+							<form th:action="@{/data/admin/dashboard?edit=create_activity}" method="POST">
+								<p>Insert activity you want to create</p>
+								<div class="container-fluid d-flex flex-row" style="padding: 0 !important">
+									<div class="d-flex field" style="margin-right: 1%">
+										<input class="in" type="text" th:name="activityname" name="activityname" required>
+						               	<label for="activityname">Activity name</label>
+									</div>
+					               	<div class="d-flex field" style="margin-left: 1%">
+						               	<select class="form-select in" required th:name="priority">
+						               		<option selected disabled hidden value="">Select a priority</option>
+										  	<option th:each="pty: ${priorities}" th:name="priority" name="priority" th:value="${pty}" th:text="${pty}"></option>
+										</select>
+									</div>
+								</div>
+								
+								<div class="d-grid gap-2">
+				  					<button class="btn btn-primary buttanone" type="submit" style="width: 100%">Submit</button>
+								</div>
+							</form>
+						</div>
+						
+						<div class="container flex-column wrapper" id="button-data-remove">
+							<form th:action="@{/data/admin/dashboard?edit=remove_activity}" method="POST">
+								<p>Insert activity you want to delete</p>
+								<div class="container-fluid field">
+									<select class="form-select in" required th:name="activityid">
+					               		<option selected disabled hidden>Select an activity</option>
+									  	<option th:each="act: ${amap}" th:name="activityid" name="activityid" th:value="${act.key}" th:text="${#strings.replace(act,'=',' - ')}"></option>
+									</select>
+								</div>
+								<div class="d-grid gap-2">
+				  					<button class="btn btn-primary buttanone" type="submit" style="width: 100%">Submit</button>
+								</div>
+							</form>
+						</div>
+			
+			
+						<div class="container flex-column wrapper" id="button-data-assign">
+							<form th:action="@{/data/admin/dashboard?edit=assign_activity}" method="POST">
+								<div class="container-fluid d-flex flex-row" style="padding: 0 !important">
+									<div class="d-flex field" style="margin-right: 1%">
+						               	<select class="form-select in" required th:name="activityid">
+			               					<option selected disabled hidden>Select an activity</option>
+							  				<option th:each="act: ${amap}" th:name="activityid" name="activityid" th:value="${act.key}" th:text="${#strings.replace(act,'=',' - ')}"></option>
+										</select>
+									</div>
+					               	<div class="d-flex field" style="margin-left: 1%">
+						               	<select class="form-select in" required th:name="username">
+			               					<option selected disabled hidden>Select a user</option>
+							  				<option th:each="u: ${ulist}" th:name="username" name="username" th:value="${u.name}" th:text="${u.name}"></option>
+										</select>
+									</div>
+								</div>
+								<div class="d-grid gap-2">
+				  					<button class="btn btn-primary buttanone" type="submit" style="width: 100%">Submit</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="tab-pane fade container-fluid" id="assignations" role="tabpanel" aria-labelledby="nav-contact-tab">
+				<div class="shadow-container container">
+					<div class="container-fluid">
+						<h4 class="text-center rosa">ASSIGNATION TABLE</h4>
+						<table class="table table-hover table-bordered">
+							<thead>
+								<tr>
+									<td><b>Name</b></td>
+									<td><b>Activity</b></td>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:if="${ilist.size} != 0" th:each="inter: ${ilist}">
+									<td th:text="${inter.user}" />
+									<td th:text="${inter.activity}" />
+								</tr>
+								<tr th:unless="${ilist.size} != 0">
+									<td colspan="3" class="text-center">No activities</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
