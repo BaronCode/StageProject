@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Error</title>
+<link href="https://fonts.googleapis.com/css?family=Encode+Sans+Semi+Condensed:100,200,300,400" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="../css/fail.css">
+<script type="text/javascript">
+$(function() {
+	  setTimeout(function(){
+	    $('body').removeClass('loading');
+	  }, 1000);
+	});
+</script>
+</head>
+
+<body class="loading">
+	<div id="top">
+		<h1>Uh Oh!</h1>
+	 	<h2>Failed to authenticate &lt;/3</h2>
+	</div>
+	<br> <br> <br>
+	<div class="gears">
+	  <div class="gear one">
+	    <div class="bar"></div>
+	    <div class="bar"></div>
+	    <div class="bar"></div>
+	  </div>
+	  <div class="gear two">
+	    <div class="bar"></div>
+	    <div class="bar"></div>
+	    <div class="bar"></div>
+	  </div>
+	  <div class="gear three">
+	    <div class="bar"></div>
+	    <div class="bar"></div>
+	    <div class="bar"></div>
+	  </div>
+	</div>
+	<div>
+		<h3>Failure reason: <span th:text="${reason}"></span></h3>
+	</div>
+  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+</body>
+</html>
