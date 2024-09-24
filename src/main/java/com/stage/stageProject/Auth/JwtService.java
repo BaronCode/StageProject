@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtService { 
     public static final String SECRET = "9D0EB6B1C2E1FAD0F53A248F6C3B5E4E2F6D8G3H1I0J7K4L1M9N2O3P5Q0R7S9T1U4V2W6X0Y3Z"; 
     private int jwtExpirationMS = 600000;
-    private Logger logger = LoggerFactory.getLogger(JwtService.class);
+    private final Logger logger = LoggerFactory.getLogger(JwtService.class);
     public String generateToken(String userName) { 
         return createToken(userName); 
     } 

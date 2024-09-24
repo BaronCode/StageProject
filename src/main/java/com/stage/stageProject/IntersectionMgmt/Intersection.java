@@ -9,8 +9,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
 @Table(name = "inter")
 public class Intersection {
 	@Id
@@ -23,23 +29,7 @@ public class Intersection {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id")
 	private Activity activity;
-		
-	public Intersection() {}
-	public Intersection(int row, User u, Activity a) {
-		this.row = row;
-		user = u;
-		activity = a;
-	}
-	
-	public int getRow() {
-		return row;
-	}
-	public User getUser() {
-		return user;
-	}
-	public Activity getActivity() {
-		return activity;
-	}
+
 	public String toString() {
 		return activity + " assigned to " + user;
 	}

@@ -1,7 +1,11 @@
 package com.stage.stageProject.IntersectionMgmt;
 
 import com.stage.stageProject.ActivitiesMgmt.Activity;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class IntersectionDetails {
 	private String name;
 	private int id;
@@ -11,20 +15,5 @@ public class IntersectionDetails {
 		id = a.getId();
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
 
 }

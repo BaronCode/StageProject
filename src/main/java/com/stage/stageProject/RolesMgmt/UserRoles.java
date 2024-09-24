@@ -6,9 +6,16 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 @Entity
 @IdClass(UserRolesPrimitive.class)
 @Table(name = "user_roles")
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
 public class UserRoles {
 	@Id
 	private String username;
@@ -16,23 +23,9 @@ public class UserRoles {
 	@Id
 	@Enumerated(EnumType.STRING)
 	private ROLES role;
-		
-	public UserRoles() {}
-	
-	public UserRoles(String n, ROLES id) {
-		username = n;
-		role = id;
-	}
 
 	public String toString() {
 		return "User " + username + " has role " + role;
-	}
-
-	public String getName() {
-		return username;
-	}
-	public ROLES getRole() {
-		return role;
 	}
 }
 

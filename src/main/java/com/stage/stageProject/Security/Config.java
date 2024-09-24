@@ -1,6 +1,8 @@
 package com.stage.stageProject.Security;
 
-import org.springframework.context.annotation.Bean; 
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration; 
 import org.springframework.security.authentication.AuthenticationManager; 
 import org.springframework.security.authentication.AuthenticationProvider; 
@@ -8,8 +10,9 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration; 
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity; 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity; 
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity; 
-import org.springframework.security.config.http.SessionCreationPolicy; 
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService; 
 import org.springframework.security.crypto.password.PasswordEncoder; 
 import org.springframework.security.web.SecurityFilterChain; 
@@ -24,16 +27,10 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@AllArgsConstructor
 public class Config { 
-    private final JwtAuthFilter authFilter; 
-    public Config(JwtAuthFilter authFilter) { 
-        this.authFilter = authFilter; 
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService(UserRepo repo, PasswordEncoder encoder) { 
-        return new UserInfoService(repo,encoder); 
-    } 
+    @Autowired
+    private JwtAuthFilter authFilter;
     
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationProvider authenticationProvider) throws Exception { 
@@ -49,7 +46,7 @@ public class Config {
             		.defaultSuccessUrl("/hello", true)
             		.failureForwardUrl("/auth/registration.html")
             )*/
-            .httpBasic(withDefaults()).csrf((csrf) -> csrf.disable())
+            .httpBasic(withDefaults()).csrf(AbstractHttpConfigurer::disable)
             .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authenticationProvider)
             .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)

@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.stage.stageProject.ActivitiesMgmt.Activity;
 import com.stage.stageProject.IntersectionMgmt.Intersection;
-import com.stage.stageProject.RolesMgmt.ROLES;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -14,30 +13,31 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 @Entity
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @Table(name = "users")
 public class User {
-	@Id
+	@Setter
+    @Getter
+    @Id
 	private String name;
-	private String mail;
+	@Setter
+    @Getter
+    private String mail;
+	@Setter
+	@Getter
 	private String psw;
 
+    @Getter
     @OneToMany(mappedBy = "user",fetch = FetchType.LAZY,cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Activity> activities = new ArrayList<>();
 
     @OneToMany(mappedBy = "user",fetch = FetchType.LAZY,cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Intersection> intersections = new ArrayList<>();
 
-    public User() {}
-	
 	public User(String n, String e, String psw) {
 		name = n;
 		mail = e;
@@ -59,15 +59,7 @@ public class User {
 		return getName();
 	}
 
-	public String getName() {
-		return name;
-	}
-	
-	public List<Activity> getActivities() {
-		return activities;
-	}
-
-	public void setActivities(List<Activity> activities) {
+    public void setActivities(List<Activity> activities) {
 		this.activities = activities;
 	}
 	
@@ -75,23 +67,4 @@ public class User {
 		activities.add(a);
 	}
 
-	public String getMail() {
-		return mail;
-	}
-	
-	public String getPassword() {
-		return psw;
-	}
-	
-	public void setPassword(String newPsw) {
-		psw = newPsw;
-	}
-	public void setMail(String newMail) {
-		mail = newMail;
-	}
-	public void setName(String newName) {
-		name = newName;
-	}
-
-	
 }

@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,15 +19,11 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class UserInfoService implements UserDetailsService {
-	private final UserRepo repo;
-	private final PasswordEncoder encoder;
-	private final Logger logger;
-	
-	public UserInfoService(UserRepo repo, PasswordEncoder encoder) {
-		this.repo = repo;
-		this.encoder = encoder;
-		logger = LoggerFactory.getLogger(UserInfoService.class);
-	}
+	@Autowired
+	private UserRepo repo;
+	@Autowired
+	private PasswordEncoder encoder;
+	private final Logger logger = LoggerFactory.getLogger(UserInfoService.class);
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -36,7 +33,7 @@ public class UserInfoService implements UserDetailsService {
 		return data;
 	}
 	public String addUser(User user) {
-		user.setPassword(encoder.encode(user.getPassword()));
+		user.setPsw(encoder.encode(user.getPsw()));
 		repo.save(user);
 		logger.info("Saved USER=" + user);
 		return "User saved successfully!";
