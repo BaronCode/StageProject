@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 	<head>
 		<meta charset="utf-8">
 		<title>DashBoard | Anchor</title>
@@ -10,8 +10,8 @@
 		<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
 		<script>
 				function show_div(action) {
-					var list = document.querySelectorAll("[id^=button-data-]");
-					var array = [...list];
+					const list = document.querySelectorAll("[id^=button-data-]");
+					const array = [...list];
 					array.forEach(el => {
 						el.style.display="none"
 					});
@@ -21,19 +21,20 @@
 				
 				$(document).ready(function() {
 
-					var colorMatch = {
-					    'REFUSED'     	: 'red',
-					    'PENDING'    	: 'orange',
-					    'ACCEPTED'   	: 'green',
-					    'IN_PROGRESS'   : 'purple',
-					    'URGENT'     	: 'red',
-					    'MEDIUM'    	: 'orange',
-					    'LOW'   		: 'green'
+					const colorMatch = {
+						'REFUSED': 'red',
+						'PENDING': 'orange',
+						'ACCEPTED': 'green',
+						'IN_PROGRESS': 'purple',
+						'URGENT': 'red',
+						'MEDIUM': 'orange',
+						'LOW': 'green',
+						'UNASSIGNED': 'grey'
 					};
 					console.log(colorMatch);
-					var el;
-					var st;
-					$('.status').each(function(index) {
+					let el;
+					let st;
+					$('.status').each(function() {
 						el = $(this);
 						st = $(this).attr('status');
 						$.each(colorMatch, function(name, value) {
@@ -44,7 +45,7 @@
 						});
 					});
 					
-					$('.priority').each(function(index) {
+					$('.priority').each(function() {
 						el = $(this);
 						st = $(this).attr('priority');
 						$.each(colorMatch, function(name, value) {
@@ -209,7 +210,7 @@
 				  			<button onclick="show_div('add')" style="margin-right: 1%" class="btn btn-primary pull-right flex-fill" type="button">Add</button>
 				  		</div>
 				  	</div>
-				  	
+				  	<!--
 				  	<div th:if="${success}!=null and ${response}!=null">
 						<div th:if="${success}==false" class="alert alert-warning alert-dismissable fade show" role="alert" id="ealert">
 								<h4 class="alert-heading">Error!</h4>
@@ -225,7 +226,7 @@
 						    	<span aria-hidden="true">&times;</span>
 						  	</button>
 						</div>
-					</div>
+					</div>-->
 					
 					<div class="container flex-column wrapper" id="button-data-add">
 						<form th:action="@{/data/dashboard?edit=add}" method="POST">
@@ -233,7 +234,7 @@
 							<div class="container-fluid d-flex flex-row" style="padding: 0 !important">
 								<div class="d-flex field" style="margin-right: 1%">
 									<input class="in" type="text" th:name="name" name="name" required>
-					               	<label for="name">Activity name</label>
+					               	<label>Activity name</label>
 								</div>
 				               	<div class="d-flex field" style="margin-left: 1%">
 					               	<select class="form-select in" required th:name="priority">

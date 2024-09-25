@@ -2,6 +2,7 @@ package com.stage.stageProject.View;
 
 import java.time.LocalDateTime;
 
+import com.stage.stageProject.Notifications.NotificationServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,7 @@ public class UserController {
 	@Autowired
 	private UserRepo urepo;
 	@Autowired
-	private NotificationService notiService;
+	private NotificationServiceImpl notiService;
 	@Autowired
     private JwtService jwtService; 
     private Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -78,7 +79,7 @@ public class UserController {
     		) {
     	User u = new User(name, mail,psw);
     	urRepo.save(new UserRoles(name, ROLES.USER));
-    	notiService.saveNotification(new Notification(notiService.findMaxId()+1, LocalDateTime.now(), false, "User creation", "Created " + u.notificationToString()));
+    	notiService.saveNotification(new Notification(notiService.findMaxId()+1, "User creation", "Created " + u.notificationToString(), LocalDateTime.now(), false));
     	
     	String response = service.addUser(u); 
     	ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -94,7 +95,7 @@ public class UserController {
     public RedirectView login(	
     		@FormParam("name") String name, 
     		@FormParam("psw") String psw) {
-    	logger.info("Tried to log in with USER=" + name + " PSW=" + psw);
+        logger.info("Tried to log in with USER={} PSW={}", name, psw);
     	Authentication authentication = null;
     	try {
     		authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(name, psw)); 
@@ -110,7 +111,7 @@ public class UserController {
         	UserToken.addToken(new AuthData(name, psw), token);
         	this.token = token;
         	authenticated = true;
-        	logger.info("Logged USER=" + name + " PSW=" + psw);
+            logger.info("Logged USER={} PSW={}", name, psw);
         	ResponseEntity.ok(token);
 			return new RedirectView("../data/");
         } else return new RedirectView(default_error + "auth_error");
@@ -124,8 +125,8 @@ public class UserController {
     
     @RequestMapping(value="/logout")
     public String logout() {
+        logger.info("Logged out user {}", jwtService.extractUsername(token));
     	UserToken.invalidateToken(token);
-    	logger.info("Logged out user " + jwtService.extractUsername(token));
     	return "/auth/login";
     }
 }

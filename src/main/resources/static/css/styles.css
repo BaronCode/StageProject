@@ -17,6 +17,9 @@ h1 {
 .green {
 	color: green;
 }
+.grey {
+    color: #656565;
+}
 .hand {
 	cursor: pointer;
 }

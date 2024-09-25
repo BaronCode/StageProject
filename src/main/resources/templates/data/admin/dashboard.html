@@ -41,12 +41,13 @@
 					    'IN_PROGRESS'   : 'purple',
 					    'URGENT'     	: 'red',
 					    'MEDIUM'    	: 'orange',
-					    'LOW'   		: 'green'
+					    'LOW'   		: 'green',
+					    'UNASSIGNED'	: 'grey'
 					};
 					console.log(colorMatch);
 					var el;
 					var st;
-					$('.status').each(function(index) {
+					$('.status').each(function() {
 						el = $(this);
 						st = $(this).attr('status');
 						$.each(colorMatch, function(name, value) {
@@ -57,7 +58,7 @@
 						});
 					});
 					
-					$('.priority').each(function(index) {
+					$('.priority').each(function() {
 						el = $(this);
 						st = $(this).attr('priority');
 						$.each(colorMatch, function(name, value) {

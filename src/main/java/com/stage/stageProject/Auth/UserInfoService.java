@@ -28,9 +28,7 @@ public class UserInfoService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		Optional<User> details = repo.findByName(username);
-		UserDetailsMgmt data = details.map(UserDetailsMgmt::new).orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found!"));
-		logger.info("Logged USER=" + data.getUsername() + " PSW=" + encoder.encode(data.getPassword()));
-		return data;
+        return details.map(UserDetailsMgmt::new).orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found!"));
 	}
 	public String addUser(User user) {
 		user.setPsw(encoder.encode(user.getPsw()));

@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 
+import com.stage.stageProject.Notifications.NotificationServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +58,7 @@ public class AdminDashboard {
 	@Autowired
 	private NotificationRepo notiRepo;
 	@Autowired
-	private NotificationService notiService;
+	private NotificationServiceImpl notiService;
 	@Autowired
 	private UserRepo uRepo;
 	@Autowired
@@ -67,7 +68,7 @@ public class AdminDashboard {
 	@Autowired
 	private UserRolesRepo urRepo;
 	
-	private Logger logger = LoggerFactory.getLogger(AdminDashboard.class);
+	private final Logger logger = LoggerFactory.getLogger(AdminDashboard.class);
 	private boolean isOwner;
 	
 	
@@ -81,12 +82,12 @@ public class AdminDashboard {
 				logger.info("Displaying dashboard of owner " + name);
 			} else logger.info("Displaying dashboard of admin " + name);
 			
-			List<User> userList = uRepo.findAll().size()==0 ? new ArrayList<>() : uRepo.findAll();
-			List<Intersection> intersectionList = repo.findAll().size()==0 ? new ArrayList<>() : repo.findAll();
-			List<Activity> activityList = aRepo.findAll().size()==0 ? new ArrayList<>() : aRepo.findAll();
-			List<Notification> notiList = notiRepo.findAll().size()==0 ? new ArrayList<>() : notiRepo.findAll();
-			List<Notification> read = notiRepo.selectByStatus(true).size()==0 ? new ArrayList<>() : notiRepo.selectByStatus(true);
-			List<Notification> unread = notiRepo.selectByStatus(false).size()==0 ? new ArrayList<>() : notiRepo.selectByStatus(false);
+			List<User> userList = uRepo.findAll().isEmpty() ? new ArrayList<>() : uRepo.findAll();
+			List<Intersection> intersectionList = repo.findAll().isEmpty() ? new ArrayList<>() : repo.findAll();
+			List<Activity> activityList = aRepo.findAll().isEmpty() ? new ArrayList<>() : aRepo.findAll();
+			List<Notification> notiList = notiRepo.findAll().isEmpty() ? new ArrayList<>() : notiRepo.findAll();
+			List<Notification> read = notiRepo.selectByStatus(true).isEmpty() ? new ArrayList<>() : notiRepo.selectByStatus(true);
+			List<Notification> unread = notiRepo.selectByStatus(false).isEmpty() ? new ArrayList<>() : notiRepo.selectByStatus(false);
 
 			activityList.sort(Comparator.comparing(Activity::getPriority).thenComparing(Comparator.nullsLast(new ActivityComparator())));
 			notiList.sort(Comparator.comparing(Notification::getTimestamp).reversed());
@@ -144,7 +145,7 @@ public class AdminDashboard {
 					if (!nameget.equals(uname)) {
 						User u = uRepo.getReferenceById(nameget);
 						message = " successfully deleted a user!\nDetails: " + uRepo.getReferenceById(nameget).consoleToString();
-						notiService.saveNotification(new Notification(notiService.findMaxId()+1, LocalDateTime.now(), false, "User deleted", u.notificationToString()));
+						notiService.saveNotification(new Notification(notiService.findMaxId()+1, "User deleted", u.notificationToString(), LocalDateTime.now(), false));
 						userService.removeUserAndActivity(nameget);
 						success = true;
 					} else {
@@ -166,7 +167,7 @@ public class AdminDashboard {
 					User u = new User(nameget, mailget, pswget);
 					userInfoService.addUser(u);
 			    	urRepo.save(new UserRoles(nameget, ROLES.USER));
-			    	notiService.saveNotification(new Notification(notiService.findMaxId()+1, LocalDateTime.now(), false, "User created", u.notificationToString()));
+			    	notiService.saveNotification(new Notification(notiService.findMaxId()+1, "User created", u.notificationToString(), LocalDateTime.now(), false));
 					message = "created a new user!\nDetails: " + u.consoleToString();
 					success = true;
 					logger.info(u.consoleToString() + " created!");
@@ -184,7 +185,7 @@ public class AdminDashboard {
 					Activity a = new Activity(id, nameget, priorityget, current);
 					current.addActivity(a);
 					userService.persist(current.getName());
-					notiService.saveNotification(new Notification(notiService.findMaxId()+1, LocalDateTime.now(), false, "Activity created", a.notificationToString()));
+					notiService.saveNotification(new Notification(notiService.findMaxId()+1, "Activity created", a.notificationToString(), LocalDateTime.now(), false));
 					logger.info("Activity " + a + " created!");
 					message = "created a new activity!\nDetails: " + a;
 					success = true;
@@ -200,7 +201,7 @@ public class AdminDashboard {
 					Activity a = aRepo.getReferenceById(idget);
 					userService.removeActivityFromUser(a.getUser().getName(), a);
 					logger.info("Deleted activity " + idget);
-					notiService.saveNotification(new Notification(notiService.findMaxId()+1, LocalDateTime.now(), false, "Activity deleted", a.notificationToString()));
+					notiService.saveNotification(new Notification(notiService.findMaxId()+1, "Activity deleted", a.notificationToString(), LocalDateTime.now(), false));
 					message = "deleted the activity with ID " + idget;
 					success = true;
 				} else if (!aRepo.existsById(idget));
@@ -218,7 +219,7 @@ public class AdminDashboard {
 					Activity a = aRepo.getReferenceById(idget);
 					repo.save(new Intersection(repo.findMaxRow()+1, u, a));
 					message = "assigned activity to user\nDetails:\n\t" + u + "\n\t" + a;
-					notiService.saveNotification(new Notification(notiService.findMaxId()+1, LocalDateTime.now(), false, "Activity assigned", a.notificationToString() + "\n" + u.notificationToString()));
+					notiService.saveNotification(new Notification(notiService.findMaxId()+1, "Activity assigned", a.notificationToString() + "\n" + u.notificationToString(), LocalDateTime.now(), false));
 					logger.info("Assigned " + a.consoleToString() + " to " + u.consoleToString());
 					success = true;
 				} else {

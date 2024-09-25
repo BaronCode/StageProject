@@ -9,6 +9,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 
+import com.stage.stageProject.Messages.MessageServiceImpl;
+import com.stage.stageProject.Notifications.NotificationServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +56,7 @@ public class UserDashboard {
 	@Autowired	
 	private UserController userController;
 	@Autowired
-	private NotificationService notiService;
+	private NotificationServiceImpl notiService;
 	@Autowired
 	private UserRepo userRepo;
 	@Autowired	
@@ -62,7 +64,7 @@ public class UserDashboard {
 	@Autowired	
 	private MessageRepo msgRepo;
 	@Autowired	
-	private MessageService msgService;
+	private MessageServiceImpl msgService;
 	@Autowired	
 	private UserService userService;
 	@Autowired	
@@ -83,7 +85,7 @@ public class UserDashboard {
     	String token = userController.token;
     	if (UserToken.checkToken(token)) {
     		String name = jwtService.extractUsername(token);
-    		logger.info("Displaying dashboard of " + name);
+            logger.info("Displaying dashboard of {}", name);
 
     		LinkedHashMap<Integer, String> aMap = new LinkedHashMap<>();
     		aRepo.findAll()
@@ -168,11 +170,11 @@ public class UserDashboard {
 		if (!aRepo.existsById(id)) {
 			Activity a = new Activity(aRepo.findMaxId()+1, name, priority, userRepo.getReferenceById(uname));
 			aRepo.save(a);
-			notiService.saveNotification(new Notification(notiService.findMaxId()+1, LocalDateTime.now(), false, "Activity creation", a.notificationToString()));
-			logger.info("Activity " + a + " created!");
+			notiService.saveNotification(new Notification(notiService.findMaxId()+1, "Activity creation", a.notificationToString(), LocalDateTime.now(), false));
+            logger.info("Activity {} created!", a);
 			message = "created a new activity!\nDetails: " + a;
 			success = true;
-		} else logger.error("Activity with id " + id + " already exists!");
+		} else logger.error("Activity with id {} already exists!", id);
 		
 		return Pair.createPair(message, success);
     }
@@ -183,7 +185,7 @@ public class UserDashboard {
 		if (current.getActivities().contains(a)) {
 			userService.removeActivityFromUser(uname, a);
 			userService.refreshUser(current);
-			notiService.saveNotification(new Notification(notiService.findMaxId()+1, LocalDateTime.now(), false, "Activity deletion", a.notificationToString()));
+			notiService.saveNotification(new Notification(notiService.findMaxId()+1, "Activity deletion", a.notificationToString(), LocalDateTime.now(), false));
 			logger.info("Deleted activity " + id);
 			message = "deleted the activity with ID " + id + "\nDetails: " + a;
 			success = true;
@@ -206,7 +208,7 @@ public class UserDashboard {
 			
 			userService.refreshUser(current);
 			interRepo.save(new Intersection(interRepo.findMaxRow()+1, current, aRepo.getReferenceById(id)));
-			notiService.saveNotification(new Notification(notiService.findMaxId()+1, LocalDateTime.now(), false, "Activity assign", "Assigned " + aRepo.getReferenceById(id).notificationToString() + " to " + current.getName()));
+			notiService.saveNotification(new Notification(notiService.findMaxId()+1, "Activity assign", "Assigned " + aRepo.getReferenceById(id).notificationToString() + " to " + current.getName(), LocalDateTime.now(), false));
 			logger.info("Assigned activity " + aRepo.getReferenceById(id));
 			message = "assigned to yourself a new activity!\nDetails: " + aRepo.getReferenceById(id);
 			success = true;
@@ -219,7 +221,7 @@ public class UserDashboard {
 		interRepo.deleteByActivity(a);
 		aRepo.deleteById(id);
 		
-		notiService.saveNotification(new Notification(notiService.findMaxId()+1, LocalDateTime.now(), false, "Activity done", "User " + current.getName() + " completed " + aRepo.getReferenceById(id).notificationToString()));
+		notiService.saveNotification(new Notification(notiService.findMaxId()+1, "Activity done", "User " + current.getName() + " completed " + aRepo.getReferenceById(id).notificationToString(), LocalDateTime.now(), false));
 		String message = "completed an activity!\nDetails: " + a;
 		logger.info("Completed " + a);
 		return Pair.createPair(message, true);
@@ -229,7 +231,7 @@ public class UserDashboard {
 		String message = "started an activity!\nDetails: " + a;
 		
 		aRepo.updateStatus(id, STATUS.IN_PROGRESS);
-		notiService.saveNotification(new Notification(notiService.findMaxId()+1, LocalDateTime.now(), false, "Activity started", "User " + current.getName() + " started " + aRepo.getReferenceById(id).notificationToString()));
+		notiService.saveNotification(new Notification(notiService.findMaxId()+1, "Activity started", "User " + current.getName() + " started " + aRepo.getReferenceById(id).notificationToString(), LocalDateTime.now(), false));
 		logger.info("Started activity " + a);
 		return Pair.createPair(message, true);
 	}
@@ -238,7 +240,7 @@ public class UserDashboard {
 		String message = "accepted the activity " + a;
 		
 		aRepo.updateStatus(id, STATUS.ACCEPTED);
-		notiService.saveNotification(new Notification(notiService.findMaxId()+1, LocalDateTime.now(), false, "Activity accepted", "User " + current.getName() + " accepted " + aRepo.getReferenceById(id).notificationToString()));
+		notiService.saveNotification(new Notification(notiService.findMaxId()+1, "Activity accepted", "User " + current.getName() + " accepted " + aRepo.getReferenceById(id).notificationToString(), LocalDateTime.now(), false));
 		logger.info("Accepted activity " + a);
 		
 		return Pair.createPair(message, true);
@@ -248,7 +250,7 @@ public class UserDashboard {
 		String message = "declined the activity " + a;
 		
 		aRepo.updateStatus(id, STATUS.REFUSED);
-		notiService.saveNotification(new Notification(notiService.findMaxId()+1, LocalDateTime.now(), false, "Activity declined", "User " + current.getName() + " declined " + aRepo.getReferenceById(id).notificationToString()));
+		notiService.saveNotification(new Notification(notiService.findMaxId()+1, "Activity declined", "User " + current.getName() + " declined " + aRepo.getReferenceById(id).notificationToString(), LocalDateTime.now(), false));
 		logger.info("Declined activity " + a);
 		
 		return new Pair<>(message, true);
@@ -264,7 +266,7 @@ public class UserDashboard {
 			@FormParam("msgrt") Optional<Boolean> msgrt
 		) {
 		if (author.isPresent()) {
-			msgService.saveMessage(new Message(aRepo.getReferenceById(id), userRepo.getReferenceById(author.get()), body.get(), LocalDateTime.now(), msgRepo.findMaxId()+1));
+			msgService.saveMessage(new Message(msgRepo.findMaxId()+1, userRepo.getReferenceById(author.get()), body.get(), LocalDateTime.now(), aRepo.getReferenceById(45)));
 		}
 		String token = userController.token;
 		if (UserToken.checkToken(token)) {

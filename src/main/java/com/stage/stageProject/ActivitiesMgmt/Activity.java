@@ -17,6 +17,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -52,8 +53,17 @@ public class Activity {
 		description = "";
 		priority = p;
 		user = u;
-		status = null;
+		status = STATUS.UNASSIGNED;
 		delegate = null;
+	}
+	public Activity(int id, String n, String d, PRIORITY p, STATUS s, User u, User del) {
+		this.id = id;
+		name = n;
+		description = d;
+		priority = p;
+		user = u;
+		status = s;
+		delegate = del;
 	}
 	
 	public String consoleToString() {

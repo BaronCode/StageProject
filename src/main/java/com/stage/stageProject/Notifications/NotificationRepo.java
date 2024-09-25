@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface NotificationRepo extends JpaRepository<Notification, Integer> {
-	@Query("SELECT new com.stage.stageProject.Notifications.Notification(id, timestamp, status, title, body) FROM Notification WHERE status=?1")
+	@Query("SELECT new com.stage.stageProject.Notifications.Notification(id, title, body, timestamp, status) FROM Notification WHERE status=?1")
 	public List<Notification> selectByStatus(boolean status);
 
 	@Query("SELECT COALESCE(MAX(id), 0) FROM Notification")
