@@ -1,34 +1,48 @@
 package com.stage.stageProject.ActivitiesMgmt;
 
+import lombok.Getter;
 
+/**
+ * Synthesis class for an Activity.
+ * <br>Getter methods are generated via Lombok - call them using get + capitalized variable nome + ().
+ * @deprecated
+ */
+@Getter
 public class ActivityDetails {
-	    private String name; 
-	    private int id;
-	    private PRIORITY priority;
-	    
-	    public ActivityDetails(Activity activity) { 
-	        name = activity.getName(); 
-	        id = activity.getId();
-	        priority = activity.getPriority();
-	    } 
+	/**
+	 * Activity name.
+	 */
+	private final String name;
+	/**
+	 * Activity ID.
+	 */
+	private final int id;
+	/**
+	 * Activity priority.
+	 */
+	private final PRIORITY priority;
 
-	    public String getName() { 
-	        return name; 
-	    } 
+	/**
+	 * Constructor.
+	 * @param activity the Activity whose fields are being synthesized.
+	 * @deprecated
+	 */
+	public ActivityDetails(Activity activity) {
+		name = activity.getName();
+		id = activity.getId();
+		priority = activity.getPriority();
+	}
 
-	    public int getId() { 
-	        return id; 
-	    } 
+	/**
+	 * Returns a String representation of this ActivityDetails.
+	 * @return a String representation of this ActivityDetails.
+	 * @deprecated
+	 */
+	public String toString() {
+		return "\n" + name +
+		"\n" + id +
+		"\n" + priority;
+	}
 
-	    public PRIORITY getPriority() { 
-	        return priority; 
-	    } 
-
-	    public String toString() {
-	    	return "\n" + name +
-	    	"\n" + id +
-	    	"\n" + priority;
-	    }
-	
 
 }
