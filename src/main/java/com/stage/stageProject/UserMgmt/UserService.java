@@ -3,8 +3,6 @@ package com.stage.stageProject.UserMgmt;
 
 import java.util.List;
 
-import com.stage.stageProject.ActivitiesMgmt.ActivityRepo;
-import com.stage.stageProject.ActivitiesMgmt.ActivityServiceImpl;
 import org.springframework.stereotype.Service;
 
 import com.stage.stageProject.ActivitiesMgmt.Activity;

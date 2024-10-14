@@ -2,8 +2,6 @@ package com.stage.stageProject.UserMgmt;
 
 import java.util.List;
 
-import com.stage.stageProject.ActivitiesMgmt.ActivityRepo;
-import com.stage.stageProject.ActivitiesMgmt.ActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

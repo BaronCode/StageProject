@@ -2,8 +2,6 @@ package com.stage.stageProject.UserMgmt;
 
 import java.util.Optional;
 
-import com.stage.stageProject.ActivitiesMgmt.Activity;
-import com.stage.stageProject.ActivitiesMgmt.ActivityServiceImpl;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
