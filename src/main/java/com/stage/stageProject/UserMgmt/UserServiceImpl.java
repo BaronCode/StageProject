@@ -40,6 +40,16 @@ public class UserServiceImpl implements UserService {
 	}
 
 	/**
+	 * Gets a User by its id
+	 * @param id the User id
+	 * @return a User with the matching ID
+	 */
+	@Override
+	public User getUser(String id) {
+		return repo.getReferenceById(id);
+	}
+
+	/**
 	 * Fetches all the User entries.
 	 * @return a List containing all the User entries.
 	 */

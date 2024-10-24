@@ -47,6 +47,7 @@ import lombok.extern.slf4j.Slf4j;
 @Controller
 @Slf4j
 public class AdminDashboard {
+	/*
 	@Autowired
 	private UserController userController;
 	@Autowired
@@ -238,4 +239,6 @@ public class AdminDashboard {
 		model.addFlashAttribute("success", success);
 		return "redirect:/data/admin/dashboard";
 	}
+	*/
+
 }

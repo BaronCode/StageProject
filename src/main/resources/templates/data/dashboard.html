@@ -59,6 +59,7 @@
 		</script>
 	</head>
 	<body>
+	<!--
 		<div class="container-fluid text-center title">
 				<h1><b>Welcome, <span th:text="${name}"></span>!</b></h1>
 				<h3><b><span th:text="${role}"></span> panel</b></h3>
@@ -210,7 +211,7 @@
 				  			<button onclick="show_div('add')" style="margin-right: 1%" class="btn btn-primary pull-right flex-fill" type="button">Add</button>
 				  		</div>
 				  	</div>
-				  	<!--
+				  	<!-
 				  	<div th:if="${success}!=null and ${response}!=null">
 						<div th:if="${success}==false" class="alert alert-warning alert-dismissable fade show" role="alert" id="ealert">
 								<h4 class="alert-heading">Error!</h4>
@@ -226,7 +227,7 @@
 						    	<span aria-hidden="true">&times;</span>
 						  	</button>
 						</div>
-					</div>-->
+					</div>->
 					
 					<div class="container flex-column wrapper" id="button-data-add">
 						<form th:action="@{/data/dashboard?edit=add}" method="POST">
@@ -250,6 +251,7 @@
 					</div>
 				</div>
 			</div>
-		</div>
+
+		</div>-->
 	</body>
 </html>

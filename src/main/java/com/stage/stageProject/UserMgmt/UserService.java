@@ -22,6 +22,13 @@ public interface UserService  {
 	User saveUser(User user);
 
     /**
+     * Gets a User by its id
+     * @param id the User id
+     * @return a User with the matching ID
+     */
+    User getUser(String id);
+
+    /**
      * Fetches all the User entries.
      * @return a List containing all the User entries.
      */

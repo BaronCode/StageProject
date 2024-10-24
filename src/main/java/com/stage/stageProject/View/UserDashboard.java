@@ -1,5 +1,6 @@
 package com.stage.stageProject.View;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -11,15 +12,17 @@ import java.util.Optional;
 
 import com.stage.stageProject.Messages.MessageServiceImpl;
 import com.stage.stageProject.Notifications.NotificationServiceImpl;
+import com.stage.stageProject.UserMgmt.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.stage.stageProject.ActivitiesMgmt.Activity;
@@ -37,10 +40,6 @@ import com.stage.stageProject.Notifications.NotificationService;
 import com.stage.stageProject.RolesMgmt.ROLES;
 import com.stage.stageProject.RolesMgmt.UserRolesPrimitive;
 import com.stage.stageProject.RolesMgmt.UserRolesRepo;
-import com.stage.stageProject.UserMgmt.User;
-import com.stage.stageProject.UserMgmt.UserRepo;
-import com.stage.stageProject.UserMgmt.UserService;
-import com.stage.stageProject.UserMgmt.UserToken;
 
 import jakarta.ws.rs.FormParam;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +57,7 @@ public class UserDashboard {
 	@Autowired
 	private NotificationServiceImpl notiService;
 	@Autowired
-	private UserRepo userRepo;
+	private UserServiceImpl userService;
 	@Autowired	
 	private IntersectionRepo interRepo;
 	@Autowired	
@@ -66,23 +65,33 @@ public class UserDashboard {
 	@Autowired	
 	private MessageServiceImpl msgService;
 	@Autowired	
-	private UserService userService;
-	@Autowired	
 	private ActivityRepo aRepo;
 	@Autowired
 	private UserRolesRepo urRepo;
-	
+
+	@CrossOrigin(origins = "http://localhost:8084/data/")
 	@RequestMapping("/")
-	public String parseRole(Model model) {
-		String name = jwtService.extractUsername(userController.token);
+	public String parseRole(Model model, Principal principal) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+		System.out.println("Cred: " + auth.getCredentials());
+		System.out.println("Cred: " + auth.isAuthenticated());
+		System.out.println("Cred: " + auth.getDetails());
+		System.out.println("Cred: " + auth.getPrincipal());
+		/*String name = jwtService.extractUsername(userController.token);
 		if (urRepo.existsById(new UserRolesPrimitive(name, ROLES.ADMIN))) {
 			return "redirect:/data/admin/dashboard";
 		} else return "redirect:/data/dashboard";
+	*/
+		return "redirect:/data/dashboard";
 	}
-	
+
+
     @RequestMapping("/dashboard")
     public String dashboard(Model model) {
-    	String token = userController.token;
+		System.out.println("dashboard");
+    	return "data/dashboard";}
+		/*String token = userController.token;
     	if (UserToken.checkToken(token)) {
     		String name = jwtService.extractUsername(token);
             logger.info("Displaying dashboard of {}", name);
@@ -145,8 +154,8 @@ public class UserDashboard {
 			RedirectAttributes model
 			) {
     	String uname = jwtService.extractUsername(userController.token);
-		User current = userRepo.getReferenceById(uname);
-		Pair<String, Boolean> pair = Pair.createPair(null, null);
+		User current = userService.getUser(uname);
+		Pair<String, Boolean> pair;
 		
 		switch (action) {
 			case "add" -> pair = add_activity(uname, name.get(), aRepo.findMaxId()+1, priority.get());
@@ -168,7 +177,7 @@ public class UserDashboard {
 		String message = "Unable to create activity!\nDetails: activity with ID " + id + " already exists";
 		
 		if (!aRepo.existsById(id)) {
-			Activity a = new Activity(aRepo.findMaxId()+1, name, priority, userRepo.getReferenceById(uname));
+			Activity a = new Activity(aRepo.findMaxId()+1, name, priority, userService.getUser(uname));
 			aRepo.save(a);
 			notiService.saveNotification(new Notification(notiService.findMaxId()+1, "Activity creation", a.notificationToString(), LocalDateTime.now(), false));
             logger.info("Activity {} created!", a);
@@ -265,9 +274,7 @@ public class UserDashboard {
 			@FormParam("body") Optional<String> body,
 			@FormParam("msgrt") Optional<Boolean> msgrt
 		) {
-		if (author.isPresent()) {
-			msgService.saveMessage(new Message(msgRepo.findMaxId()+1, userRepo.getReferenceById(author.get()), body.get(), LocalDateTime.now(), aRepo.getReferenceById(45)));
-		}
+        author.ifPresent(s -> msgService.saveMessage(new Message(msgRepo.findMaxId() + 1, userService.getUser(s), body.get(), LocalDateTime.now(), aRepo.getReferenceById(45))));
 		String token = userController.token;
 		if (UserToken.checkToken(token)) {
 			String name = jwtService.extractUsername(token);
@@ -281,7 +288,7 @@ public class UserDashboard {
     		String format = "d/MM, HH:mm";
     		model.addAttribute("formatter", DateTimeFormatter.ofPattern(format));
     		List<Message> msgs = loadMessages(id).stream().sorted(Comparator.comparing(Message::getTimestamp).reversed()).toList();
-    		if (msgs==null || msgs.size()==0) msgs = new ArrayList<>();
+    		if (msgs.isEmpty()) msgs = new ArrayList<>();
     		model.addAttribute("messages", msgs);
 			return "/data/editActivity";
 		} else return "redirect:/auth/fail?reason=credentials_expired";

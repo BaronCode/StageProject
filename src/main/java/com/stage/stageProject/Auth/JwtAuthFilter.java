@@ -2,6 +2,7 @@ package com.stage.stageProject.Auth;
 
 import java.io.IOException;
 
+import com.stage.stageProject.UserMgmt.UserToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +16,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Collections;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter { 
@@ -24,12 +26,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private UserInfoService userDetailsService; 
     
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException { 
-        try {
-			String authHeader = request.getHeader("Authorization"); 
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {try {
+			Collections.list(request.getHeaderNames()).forEach(System.out::println);
+			String authHeader = request.getHeader("AUTHORIZATION");
+			String h = response.getHeader("AUTHORIZATION");
+			String asdfasf = request.getHeader("HOST");
 		    String token = null; 
-		    String username = null; 
-		    if (authHeader != null && authHeader.startsWith("Bearer ")) { 
+		    String username = null;
+		    if (authHeader != null && authHeader.startsWith("Bearer ")) {
+				System.out.println("CE LHO FATTA DIO CANE");
 		        token = authHeader.substring(7);
 		        username = jwtService.extractUsername(token); 
 		    } 
@@ -47,8 +52,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 			// allow for Refresh Token creation if following conditions are true.
 			if (isRefreshToken != null && isRefreshToken.equals("true") && requestURL.contains("refreshtoken")) {
 				allowForRefreshToken(e, request);
-			} else
-			request.setAttribute("exception", e);
+			} else request.setAttribute("exception", e);
         }
         filterChain.doFilter(request, response); 
     } 
