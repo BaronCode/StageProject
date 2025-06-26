@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
@@ -91,10 +92,10 @@ public class UserController {
     
     
     
-    @RequestMapping("/login")
+    @RequestMapping(value="/login", method= RequestMethod.POST)
     public RedirectView login(	
-    		@FormParam("name") String name, 
-    		@FormParam("psw") String psw) {
+    		@RequestParam("name") String name,
+    		@RequestParam("psw") String psw) {
         logger.info("Tried to log in with USER={} PSW={}", name, psw);
     	Authentication authentication = null;
     	try {

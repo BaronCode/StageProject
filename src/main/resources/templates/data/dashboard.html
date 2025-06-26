@@ -29,7 +29,8 @@
 						'URGENT': 'red',
 						'MEDIUM': 'orange',
 						'LOW': 'green',
-						'UNASSIGNED': 'grey'
+						'UNASSIGNED': 'grey',
+						'COMPLETED': 'grey'
 					};
 					console.log(colorMatch);
 					let el;
@@ -99,7 +100,7 @@
 									<td th:text="${del.id}" />
 									<td class="priority bold" th:attr="priority=${del.priority}" th:text="${del.priority}" />
 									<td class="status bold" th:attr="status=${del.status}" th:text="${del.status}" />
-									<td class="d-flex">
+									<td th:if="${del.status!=T(com.stage.stageProject.ActivitiesMgmt.STATUS).COMPLETED}" class="d-flex">
 										<form th:if="${del.status==T(com.stage.stageProject.ActivitiesMgmt.STATUS).IN_PROGRESS}" th:action="@{/data/dashboard?edit=done}" style="width:100%" method="POST">
 											<button class="btn btn-primary pull-right" style="width:100%" th:name="id" th:value="${del.id}" type="submit">Done</button>
 										</form>
@@ -115,18 +116,19 @@
 											</form>
 										</div>
 					  				</td>
-									<td>
+									<td th:if="${del.status!=T(com.stage.stageProject.ActivitiesMgmt.STATUS).COMPLETED}">
 										<form th:action="@{/data/editActivity}" style="width:100%" method="POST">
 											<input type="hidden" th:name="role" th:value="${role}">
 											<button class="btn btn-primary pull-right" style="width:100%" th:name="id" th:value="${del.id}" type="submit">Edit</button>
 										</form>
 					  				</td>
-					  				<td>
+					  				<td th:if="${del.status!=T(com.stage.stageProject.ActivitiesMgmt.STATUS).COMPLETED}">
 										<form th:action="@{/data/editActivity#msg}" style="width:100%"  method="POST">
 											<input type="hidden" th:name="role" th:value="${role}">
 											<button class="btn btn-primary pull-right" style="width:100%" th:name="id" th:value="${del.id}" type="submit">Chat</button>
 										</form>
 					  				</td>
+                                    <td th:if="${del.status==T(com.stage.stageProject.ActivitiesMgmt.STATUS).COMPLETED}" colspan="3"></td>
 								</tr>
 								<tr th:unless="${delegate.size} != 0">
 									<td colspan="3" class="text-center">No activities</td>

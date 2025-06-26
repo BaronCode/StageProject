@@ -146,7 +146,7 @@ public class UserDashboard {
 			) {
     	String uname = jwtService.extractUsername(userController.token);
 		User current = userRepo.getReferenceById(uname);
-		Pair<String, Boolean> pair = Pair.createPair(null, null);
+		Pair<String, Boolean> pair;
 		
 		switch (action) {
 			case "add" -> pair = add_activity(uname, name.get(), aRepo.findMaxId()+1, priority.get());
@@ -178,6 +178,7 @@ public class UserDashboard {
 		
 		return Pair.createPair(message, success);
     }
+
 	private Pair<String, Boolean> remove_activity(User current, String uname, int id) {
 		boolean success = false;
     	String message = "Unable to delete activity!\nDetails: trying to delete activity not created by " + uname;
@@ -218,8 +219,7 @@ public class UserDashboard {
 	}
 	private Pair<String, Boolean> done_activity(User current, int id) {
 		Activity a = aRepo.getReferenceById(id);
-		interRepo.deleteByActivity(a);
-		aRepo.deleteById(id);
+		aRepo.updateActivity(a.getId(), a.getName(), a.getDescription(), a.getPriority(), STATUS.COMPLETED);
 		
 		notiService.saveNotification(new Notification(notiService.findMaxId()+1, "Activity done", "User " + current.getName() + " completed " + aRepo.getReferenceById(id).notificationToString(), LocalDateTime.now(), false));
 		String message = "completed an activity!\nDetails: " + a;
