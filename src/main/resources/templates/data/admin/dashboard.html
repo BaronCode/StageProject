@@ -129,7 +129,7 @@
 							</form>
 						</div>
 						<hr>
-						<p style="white-space: pre" th:text='${ntf.body.replaceAll("\[", " ").replaceAll("\]", "")}'></p>
+						<p style="white-space: pre-wrap" th:text='${ntf.body.replaceAll("\[", " ").replaceAll("\]", "")}'></p>
 						<hr>
 						<span th:text="${#strings.multipleReplace(ntf.timestamp.toString.replaceFirst('[.].*', ''), 'T', '&nbsp;')}"></span>						
 					</div>

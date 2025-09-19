@@ -1,4 +1,4 @@
-package com.stage.stageProject.View;
+/*package com.stage.stageProject.View;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,17 +23,14 @@ import com.stage.stageProject.ActivitiesMgmt.Activity;
 import com.stage.stageProject.ActivitiesMgmt.ActivityComparator;
 import com.stage.stageProject.ActivitiesMgmt.ActivityRepo;
 import com.stage.stageProject.ActivitiesMgmt.PRIORITY;
-import com.stage.stageProject.ActivitiesMgmt.STATUS;
 import com.stage.stageProject.Auth.JwtService;
-import com.stage.stageProject.Auth.UserInfoService;
+import com.stage.stageProject.Auth.UserDetailsService;
 import com.stage.stageProject.IntersectionMgmt.Intersection;
 import com.stage.stageProject.IntersectionMgmt.IntersectionRepo;
 import com.stage.stageProject.Notifications.Notification;
 import com.stage.stageProject.Notifications.NotificationRepo;
-import com.stage.stageProject.Notifications.NotificationService;
 import com.stage.stageProject.RolesMgmt.ROLES;
 import com.stage.stageProject.RolesMgmt.UserRoles;
-import com.stage.stageProject.RolesMgmt.UserRolesPrimitive;
 import com.stage.stageProject.RolesMgmt.UserRolesRepo;
 import com.stage.stageProject.UserMgmt.User;
 import com.stage.stageProject.UserMgmt.UserRepo;
@@ -48,13 +45,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AdminDashboard {
 	@Autowired
-	private UserController userController;
+	private AuthenticationManager userController;
 	@Autowired
 	private JwtService jwtService;
 	@Autowired
 	private UserService userService;
 	@Autowired
-	private UserInfoService userInfoService;
+	private UserDetailsService userInfoService;
 	@Autowired
 	private NotificationRepo notiRepo;
 	@Autowired
@@ -75,7 +72,7 @@ public class AdminDashboard {
 	@RequestMapping("/dashboard")
 	public String adminDashboard(Model model) {
 		String token = userController.token;
-		String name = jwtService.extractUsername(token);
+		String name = jwtService.extractUserMail(token);
 		isOwner = urRepo.existsById(new UserRolesPrimitive(name, ROLES.OWNER));
 		if (UserToken.checkToken(token) && urRepo.existsById(new UserRolesPrimitive(name, ROLES.ADMIN))) {
 			if (isOwner) {
@@ -134,7 +131,7 @@ public class AdminDashboard {
 			RedirectAttributes model
 			) {
     	boolean success = false;
-		String uname = jwtService.extractUsername(userController.token);
+		String uname = jwtService.extractUserMail(userController.token);
 		User current = uRepo.getReferenceById(uname);
 		switch (action) {	
 			case "delete_user" -> {
@@ -199,7 +196,7 @@ public class AdminDashboard {
 				int idget = activityid.get();
 				if (aRepo.existsById(idget)) {
 					Activity a = aRepo.getReferenceById(idget);
-					userService.removeActivityFromUser(a.getUser().getName(), a);
+					userService.removeActivityFromUser(a.getCreator().getName(), a);
 					logger.info("Deleted activity " + idget);
 					notiService.saveNotification(new Notification(notiService.findMaxId()+1, "Activity deleted", a.notificationToString(), LocalDateTime.now(), false));
 					message = "deleted the activity with ID " + idget;
@@ -239,3 +236,4 @@ public class AdminDashboard {
 		return "redirect:/data/admin/dashboard";
 	}
 }
+*/

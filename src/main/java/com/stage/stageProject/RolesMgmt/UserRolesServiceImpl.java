@@ -1,34 +1,20 @@
 package com.stage.stageProject.RolesMgmt;
 
-import java.util.List;
+import com.stage.stageProject.UserMgmt.UserServiceImpl;
+import org.springframework.stereotype.Service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
+@Service
 public class UserRolesServiceImpl implements UserRolesService {
+    private     final       UserRolesRepo   userRolesRepo;
+    private     final       UserServiceImpl userService;
 
-	@Autowired
-	private UserRolesRepo repo;
-	
-	@Override
-	public UserRoles saveRoles(UserRoles roles) {
-		return repo.save(roles);
-	}
+    public UserRolesServiceImpl(UserRolesRepo urr, UserServiceImpl us) {
+        userRolesRepo = urr;
+        userService = us;
+    }
 
-	@Override
-	public List<UserRoles> fetchRolesList() {
-		return (List<UserRoles>) repo.findAll();
-	}
-
-	@Override
-	public UserRoles updateRoles(UserRoles roles, UserRolesPrimitive primitive) {
-		return null;
-	}
-
-	@Override
-	public void deleteRolesById(UserRolesPrimitive primitive) {
-		repo.deleteById(primitive);
-	}
-	
-	
-	
+    @Override
+    public boolean existsAdmin(String email) {
+        return userRolesRepo.findById(new UserRolesPrimitive(userService.getUserByEmail(email), ROLES.ADMIN)).isPresent();
+    }
 }

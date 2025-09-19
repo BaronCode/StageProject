@@ -1,31 +1,17 @@
 package com.stage.stageProject.RolesMgmt;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
-import jakarta.persistence.Table;
+import com.stage.stageProject.UserMgmt.User;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Entity
-@IdClass(UserRolesPrimitive.class)
-@Table(name = "user_roles")
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
+@Getter @Entity @IdClass(UserRolesPrimitive.class) @Table(name = "user_roles") @NoArgsConstructor @AllArgsConstructor
 public class UserRoles {
-	@Id
-	private String username;
-	
-	@Id
-	@Enumerated(EnumType.STRING)
-	private ROLES role;
-
-	public String toString() {
-		return "User " + username + " has role " + role;
-	}
+	@Setter
+    @NotNull @Id @ManyToOne(optional = false) @JoinColumn(name = "user", nullable = false)		private		User		user;
+	@Id	@Enumerated(EnumType.STRING) 															private 	ROLES 		role;
 }
 

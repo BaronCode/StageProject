@@ -1,141 +1,100 @@
 package com.stage.stageProject.View;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Optional;
-
-import com.stage.stageProject.Messages.MessageServiceImpl;
 import com.stage.stageProject.Notifications.NotificationServiceImpl;
+import com.stage.stageProject.RolesMgmt.UserRolesServiceImpl;
+import com.stage.stageProject.UserMgmt.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.stage.stageProject.ActivitiesMgmt.Activity;
-import com.stage.stageProject.ActivitiesMgmt.ActivityRepo;
-import com.stage.stageProject.ActivitiesMgmt.PRIORITY;
-import com.stage.stageProject.ActivitiesMgmt.STATUS;
 import com.stage.stageProject.Auth.JwtService;
-import com.stage.stageProject.IntersectionMgmt.Intersection;
-import com.stage.stageProject.IntersectionMgmt.IntersectionRepo;
-import com.stage.stageProject.Messages.Message;
-import com.stage.stageProject.Messages.MessageRepo;
-import com.stage.stageProject.Messages.MessageService;
-import com.stage.stageProject.Notifications.Notification;
-import com.stage.stageProject.Notifications.NotificationService;
-import com.stage.stageProject.RolesMgmt.ROLES;
-import com.stage.stageProject.RolesMgmt.UserRolesPrimitive;
-import com.stage.stageProject.RolesMgmt.UserRolesRepo;
-import com.stage.stageProject.UserMgmt.User;
-import com.stage.stageProject.UserMgmt.UserRepo;
-import com.stage.stageProject.UserMgmt.UserService;
-import com.stage.stageProject.UserMgmt.UserToken;
 
-import jakarta.ws.rs.FormParam;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequestMapping("/data")
 @Controller
 public class UserDashboard {
-	
-	@Autowired    
-	private JwtService jwtService; 
-	private Logger logger = LoggerFactory.getLogger(UserDashboard.class);
-	@Autowired	
-	private UserController userController;
-	@Autowired
-	private NotificationServiceImpl notiService;
-	@Autowired
-	private UserRepo userRepo;
-	@Autowired	
-	private IntersectionRepo interRepo;
-	@Autowired	
-	private MessageRepo msgRepo;
-	@Autowired	
-	private MessageServiceImpl msgService;
-	@Autowired	
-	private UserService userService;
-	@Autowired	
-	private ActivityRepo aRepo;
-	@Autowired
-	private UserRolesRepo urRepo;
-	
+
+    private		final 		JwtService 					jwtService;
+    private		final       UserServiceImpl             userService;
+    private		final		NotificationServiceImpl 	notificationService;
+    private		final       UserRolesServiceImpl        userRolesService;
+    private		final		Logger						logger;
+
+    public UserDashboard(JwtService js, UserServiceImpl usi, NotificationServiceImpl nsi, UserRolesServiceImpl ursi) {
+        this.jwtService = js;
+        this.userService = usi;
+        this.notificationService = nsi;
+        this.userRolesService = ursi;
+        this.logger = LoggerFactory.getLogger(AuthenticationController.class);
+    }
+
 	@RequestMapping("/")
-	public String parseRole(Model model) {
-		String name = jwtService.extractUsername(userController.token);
-		if (urRepo.existsById(new UserRolesPrimitive(name, ROLES.ADMIN))) {
-			return "redirect:/data/admin/dashboard";
-		} else return "redirect:/data/dashboard";
+	public String parseRole(Authentication a, Model model) {
+        System.out.println("passo di qua");
+		String name = a.getName();
+		if (userRolesService.existsAdmin(name)) {
+            return "redirect:/data/admin/dashboard";
+        } else return "redirect:/data/dashboard";
 	}
-	
+
     @RequestMapping("/dashboard")
-    public String dashboard(Model model) {
-    	String token = userController.token;
-    	if (UserToken.checkToken(token)) {
-    		String name = jwtService.extractUsername(token);
-            logger.info("Displaying dashboard of {}", name);
+    public String dashboard(Authentication a, Model model) {
+    	String email = a.getName();
+        logger.info("Displaying dashboard of {}", userService.getNameByEmail(email));
+/*
+        LinkedHashMap<Integer, String> aMap = new LinkedHashMap<>();
+        aRepo.findAll()
+            .stream()
+            .sorted(Comparator.comparing(Activity::getId)
+                    .reversed())
+            .forEach(o->aMap.put(o.getId(), o.getName()));
 
-    		LinkedHashMap<Integer, String> aMap = new LinkedHashMap<>();
-    		aRepo.findAll()
-    			.stream()
-    			.sorted(Comparator.comparing(Activity::getId)
-    					.reversed())
-    			.forEach(o->aMap.put(o.getId(), o.getName()));
-    		
-    		LinkedHashMap<Integer, String> createdMap = new LinkedHashMap<>();
-    		aRepo.findAll()
-    			.stream()
-    			.sorted(Comparator.comparing(Activity::getId)
-    					.reversed())
-    			.filter(o->o
-    					.getUser()
-    					.getName()
-    					.equals(name))
-    			.forEach(o->createdMap.put(o.getId(), o.getName()));
-    		
-    		List<Intersection> ilist = interRepo.findAll();
-    		
-    		ArrayList<Activity> delegate = new ArrayList<>();
-    		ArrayList<Activity> activities = new ArrayList<>();
-    		for (Intersection i : ilist) {
-    			if (i.getUser().getName().equals(name)) {
-    				if (i.getActivity().getDelegate().getName().equals(name)) {
-    					delegate.add(i.getActivity());
-    				} else activities.add(i.getActivity());
-    			}
-    		}
-    		delegate.sort(Comparator.comparing(Activity::getPriority).thenComparing(Activity::getStatus));
-    		activities.sort(Comparator.comparing(Activity::getPriority).thenComparing(Activity::getStatus));
-    		
-    		ArrayList<Activity> created = new ArrayList<>(aRepo.findAll().stream().filter(o->o.getUser().getName().equals(name)).toList());
+        LinkedHashMap<Integer, String> createdMap = new LinkedHashMap<>();
+        aRepo.findAll()
+            .stream()
+            .sorted(Comparator.comparing(Activity::getId)
+                    .reversed())
+            .filter(o->o
+                    .getCreator()
+                    .getName()
+                    .equals(name))
+            .forEach(o->createdMap.put(o.getId(), o.getName()));
 
-    		model.addAttribute("admin", urRepo.existsById(new UserRolesPrimitive(name, ROLES.ADMIN)));
-    		model.addAttribute("name", name);
-    		model.addAttribute("role", ROLES.USER);
-    		model.addAttribute("activities", activities);
-    		model.addAttribute("delegate", delegate);
-    		model.addAttribute("created", created);
-    		model.addAttribute("priorities", Arrays.asList(PRIORITY.values()));
-    		model.addAttribute("mappedActivities", aMap);
-    		model.addAttribute("createdActivities", createdMap);
+        List<Intersection> ilist = interRepo.findAll();
 
-    		return "/data/dashboard";
-    	} else return "redirect:/auth/fail?reason=credentials_expired";
+        ArrayList<Activity> delegate = new ArrayList<>();
+        ArrayList<Activity> activities = new ArrayList<>();
+        for (Intersection i : ilist) {
+            if (i.getUser().getName().equals(name)) {
+                if (i.getActivity().getDelegate().getName().equals(name)) {
+                    delegate.add(i.getActivity());
+                } else activities.add(i.getActivity());
+            }
+        }
+        delegate.sort(Comparator.comparing(Activity::getPriority).thenComparing(Activity::getStatus));
+        activities.sort(Comparator.comparing(Activity::getPriority).thenComparing(Activity::getStatus));
+
+        ArrayList<Activity> created = new ArrayList<>(aRepo.findAll().stream().filter(o->o.getCreator().getName().equals(name)).toList());
+
+        model.addAttribute("admin", urRepo.existsById(new UserRolesPrimitive(name, ROLES.ADMIN)));
+        model.addAttribute("name", name);
+        model.addAttribute("role", ROLES.USER);
+        model.addAttribute("activities", activities);
+        model.addAttribute("delegate", delegate);
+        model.addAttribute("created", created);
+        model.addAttribute("priorities", Arrays.asList(PRIORITY.values()));
+        model.addAttribute("mappedActivities", aMap);
+        model.addAttribute("createdActivities", createdMap);
+*/
+        return "/data/dashboard";
     	
     }
-	
+	/*
     @PostMapping("/dashboard")
 	public String editDashboard(
 			@RequestParam(value = "edit", defaultValue="add") String action,
@@ -144,7 +103,7 @@ public class UserDashboard {
 			@FormParam("priority") Optional<PRIORITY> priority,
 			RedirectAttributes model
 			) {
-    	String uname = jwtService.extractUsername(userController.token);
+    	String uname = jwtService.extractUserMail(userController.token);
 		User current = userRepo.getReferenceById(uname);
 		Pair<String, Boolean> pair;
 		
@@ -266,11 +225,11 @@ public class UserDashboard {
 			@FormParam("msgrt") Optional<Boolean> msgrt
 		) {
 		if (author.isPresent()) {
-			msgService.saveMessage(new Message(msgRepo.findMaxId()+1, userRepo.getReferenceById(author.get()), body.get(), LocalDateTime.now(), aRepo.getReferenceById(45)));
+			msgService.saveMessage(new Message(msgRepo.findMaxId()+1, userRepo.getReferenceById(author.get()), body.get(), LocalDateTime.now(), aRepo.getReferenceById(id)));
 		}
 		String token = userController.token;
 		if (UserToken.checkToken(token)) {
-			String name = jwtService.extractUsername(token);
+			String name = jwtService.extractUserMail(token);
 			Activity act = aRepo.findById(id).get();
 			model.addAttribute("delegate", act.getDelegate().getName().equals(name));
 			model.addAttribute("name", name);

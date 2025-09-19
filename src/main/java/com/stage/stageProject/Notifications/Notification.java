@@ -2,30 +2,22 @@ package com.stage.stageProject.Notifications;
 
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.stage.stageProject.ActivitiesMgmt.PRIORITY;
+import com.stage.stageProject.UserMgmt.User;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Entity
-@NoArgsConstructor
-@AllArgsConstructor
-@Table(name = "notifications")
+@Getter @Setter @Entity @NoArgsConstructor @AllArgsConstructor @Table(name = "notifications")
 public class Notification {
-	@Id
-	private int id;
-	private String title;
-	private String body;
-	private LocalDateTime timestamp;
-	@Setter
-	private boolean status;
+	@NotNull @Id 										private 	int 			id;
+	@NotNull											private		String			body;
+	@NotNull											private 	LocalDateTime 	timestamp;
+	@NotNull @ManyToOne @JoinColumn(name = "sender")	private 	User 			sender;
+	@NotNull @ManyToOne @JoinColumn(name = "receiver")	private 	User 			receiver;
+	@NotNull 											private 	boolean 		status;
 
-	@Override
-	public String toString() {
-		return "[" + timestamp.toString() +"] " + title + ": " + body;
-	}
 }
