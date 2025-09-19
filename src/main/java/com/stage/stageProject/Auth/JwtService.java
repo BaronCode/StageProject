@@ -2,6 +2,7 @@ package com.stage.stageProject.Auth;
 import java.security.Key;
 import java.util.Date;
 
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class JwtService { 
     private     final   String      secret;
+    @Getter
     private     final   long        jwtExpiration;
     private     final   Logger      logger;
 

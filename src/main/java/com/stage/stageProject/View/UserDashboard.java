@@ -6,6 +6,7 @@ import com.stage.stageProject.UserMgmt.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,12 +35,10 @@ public class UserDashboard {
     }
 
 	@RequestMapping("/")
-	public String parseRole(Authentication a, Model model) {
-        System.out.println("passo di qua");
-		String name = a.getName();
-		if (userRolesService.existsAdmin(name)) {
-            return "redirect:/data/admin/dashboard";
-        } else return "redirect:/data/dashboard";
+	public String parseRole(Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("authentication: " + authentication.getPrincipal().toString());
+        return "redirect:/data/dashboard/";
 	}
 
     @RequestMapping("/dashboard")

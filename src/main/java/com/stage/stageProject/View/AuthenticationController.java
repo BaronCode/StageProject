@@ -6,6 +6,7 @@ import com.stage.stageProject.RolesMgmt.*;
 import com.stage.stageProject.UserMgmt.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -78,9 +79,18 @@ public class AuthenticationController {
 		if (auth.isAuthenticated()) {
 			logger.info("User {} successfully logged in with password {}", name, psw);
 			String token = jwtService.generateToken(auth.getName());
-			return ResponseEntity.ok(token);
+			LoginResponse loginResponse = new LoginResponse();
+			loginResponse.setToken(token);
+			loginResponse.setExpiration(String.valueOf(jwtService.getJwtExpiration()));
+			return ResponseEntity.ok(loginResponse);
 		} else return null;
-    } 
+    }
+
+	private HttpHeaders buildHeader(String token) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+		return headers;
+	}
     
     @GetMapping("/fail")
     public String fail(@RequestParam(value = "reason", defaultValue = "generic") String reason, Model model) {
